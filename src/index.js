@@ -1,6 +1,8 @@
 const express = require('express');
 const { readTalkersData } = require('./utils/fsUtils');
 const generateToken = require('./utils/generateToken');
+const validateEmail = require('./middlewares/validateEmail');
+const validatePassword = require('./middlewares/validatePassword');
 
 const app = express();
 app.use(express.json());
@@ -28,13 +30,8 @@ app.get('/talker/:id', async (req, res) => {
   return res.status(HTTP_OK_STATUS).json(talker);
 });
 
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
+app.post('/login', validateEmail, validatePassword, (req, res) => {
   const token = generateToken();
-
-  if ([email, password].includes(undefined)) {
-    return res.status(401).json({ message: 'Campos ausentes!' });
-  }
 
   return res.status(200).json({ token });
 });
