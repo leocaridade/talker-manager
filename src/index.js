@@ -1,8 +1,14 @@
 const express = require('express');
-const { readTalkersData } = require('./utils/fsUtils');
+const { readTalkersData, writeNewTalkerData } = require('./utils/fsUtils');
 const generateToken = require('./utils/generateToken');
 const validateEmail = require('./middlewares/validateEmail');
 const validatePassword = require('./middlewares/validatePassword');
+const validateName = require('./middlewares/validateName');
+const validateAge = require('./middlewares/validateAge');
+const validateTalk = require('./middlewares/validateTalk');
+const validateWatchedAt = require('./middlewares/validateWatchedAt');
+const validateRate = require('./middlewares/validateRate');
+const auth = require('./middlewares/auth');
 
 const app = express();
 app.use(express.json());
@@ -34,6 +40,31 @@ app.post('/login', validateEmail, validatePassword, (req, res) => {
   const token = generateToken();
 
   return res.status(200).json({ token });
+});
+
+app.post('/talker',
+  auth,
+  validateName,
+  validateAge,
+  validateTalk,
+  validateWatchedAt,
+  validateRate,
+  async (req, res) => {
+    const { name, age, talk } = req.body;
+    const { watchedAt, rate } = talk;
+
+    const newTalker = {
+      name,
+      age,
+      talk: {
+        watchedAt,
+        rate,
+      },
+    };
+
+    const newTalkerWithId = await writeNewTalkerData(newTalker);
+
+    return res.status(201).json(newTalkerWithId);
 });
 
 app.listen(PORT, () => {
