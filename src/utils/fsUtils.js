@@ -43,8 +43,22 @@ async function updateTalkerData(id, updatedTalkerData) {
   }
 }
 
+async function deleteTalkerData(id) {
+  const talkerList = await readTalkersData();
+  const updatedTalkerList = talkerList.filter((talker) => talker.id !== id);
+
+  const updatedData = JSON.stringify(updatedTalkerList, null, 2);
+
+  try {
+    await fs.writeFile(path.resolve(__dirname, '../talker.json'), updatedData);
+  } catch (err) {
+    console.log(`Erro na escrita do arquivo: ${err}`);
+  }
+}
+
 module.exports = {
   readTalkersData,
   writeNewTalkerData,
   updateTalkerData,
+  deleteTalkerData,
 };

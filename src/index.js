@@ -1,5 +1,10 @@
 const express = require('express');
-const { readTalkersData, writeNewTalkerData, updateTalkerData } = require('./utils/fsUtils');
+const {
+  readTalkersData,
+  writeNewTalkerData,
+  updateTalkerData,
+  deleteTalkerData,
+} = require('./utils/fsUtils');
 const generateToken = require('./utils/generateToken');
 const validateEmail = require('./middlewares/validateEmail');
 const validatePassword = require('./middlewares/validatePassword');
@@ -87,6 +92,13 @@ app.put('/talker/:id',
     } 
 
     return res.status(200).json(updatedTalker);
+});
+
+app.delete('/talker/:id', auth, async (req, res) => {
+  const { id } = req.params;
+  await deleteTalkerData(Number(id));
+
+  return res.status(204).json();
 });
 
 app.listen(PORT, () => {
